@@ -1,14 +1,24 @@
 package com.kankanla.e560.m20190714_lux;
 
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.media.projection.MediaProjection;
+import android.media.projection.MediaProjectionManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
-
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +29,11 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
     private boolean booleanViewA, booleanViewB, booleanMax;
     private TextView ButtonA, ButtonB, ButtonMax, ButtonHold, iconHDA, iconHDB, menuMax, menuDate;
     private LIGHT_Sensor light_sensor;
-
+    private static final int REQUEST_MEDIA_PROJECTION = 1001;
+    private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 2001;
+    private MediaProjectionManager mediaProjectionManager;
+    private MediaProjection mediaProjection;
+    private ScreenShot screenShot;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -30,7 +44,6 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         light_sensor = new LIGHT_Sensor(this, this);
         light_sensor.registerListener();
     }
-
 
     @Override
     protected void onStart() {
@@ -85,6 +98,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -116,6 +130,85 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                 }
                 break;
             case R.id.ButtonHold:
+                StorageShow();
+                if (mediaProjectionManager == null) {
+                    ScreenShow();
+                } else {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                screenShot.getScreenshot();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
+                break;
+        }
+    }
+
+    private void StorageShow() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
+                Intent intent = new Intent();
+                intent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+//                intent.setData(Uri.parse("package:com.kankanla.e560.m20190714_lux"));
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, 99);
+                Toast.makeText(this, "ファイルの保存権限を与えてください", Toast.LENGTH_LONG).show();
+            }
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
+            //            //2019-07-28 02:23:45.512 1424-7165/? I/ActivityManager: START u0 {act=android.settings.APPLICATION_DETAILS_SETTINGS dat=package:com.kankanla.e560.m20190714_lux flg=0x10008000 cmp=com.android.settings/.applications.InstalledAppDetails bnds=[326,1545][986,1713]} from uid 10021
+            //            //intent.setData(Uri.parse("package:" + packageName));
+        } else {
+            // Permission has already been granted
+//            screenShot.getScreenshot();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void ScreenShow() {
+        mediaProjectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+        if (mediaProjectionManager != null) {
+            startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_WRITE_EXTERNAL_STORAGE:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "ファイルの書き込み権限がありません", Toast.LENGTH_LONG).show();
+                    return;
+                } else {
+                    Toast.makeText(this, "キャプチャファイルの保存できます", Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_MEDIA_PROJECTION:
+                if (resultCode != RESULT_OK) {
+                    Toast.makeText(this, "User cancelled", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (mediaProjection == null) {
+                    mediaProjection = mediaProjectionManager.getMediaProjection(resultCode, data);
+                    screenShot = new ScreenShot(this, mediaProjection);
+                    screenShot.get();
+                }
                 break;
         }
     }
