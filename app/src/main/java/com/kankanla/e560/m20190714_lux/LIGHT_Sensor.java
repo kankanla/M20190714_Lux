@@ -1,23 +1,17 @@
 package com.kankanla.e560.m20190714_lux;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.hardware.display.VirtualDisplay;
 import android.icu.util.Calendar;
-import android.media.Image;
-import android.media.ImageReader;
-import android.media.projection.MediaProjection;
-import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.widget.ImageView;
 
-import java.nio.ByteBuffer;
+
+
 import java.text.SimpleDateFormat;
 
 public class LIGHT_Sensor implements SensorEventListener {
@@ -28,9 +22,6 @@ public class LIGHT_Sensor implements SensorEventListener {
     private boolean sensorREG = false;
     private LIGHT_SensorCallBack callBack;
     private SimpleDateFormat simpleDateFormat;
-
-
-
 
     public LIGHT_Sensor(Context context, LIGHT_SensorCallBack callBack) {
         this.context = context;

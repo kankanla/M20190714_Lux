@@ -190,7 +190,7 @@
                         android:layout_height="match_parent"
                         android:layout_margin="1dp"
                         android:layout_weight="1"
-                        android:background="@color/colorWhite"
+                        android:background="@color/colorYellow"
                         android:gravity="center"
                         android:text="ADH"
                         android:textSize="20sp" />
@@ -201,7 +201,7 @@
                         android:layout_height="match_parent"
                         android:layout_margin="1dp"
                         android:layout_weight="1"
-                        android:background="@color/colorWhite"
+                        android:background="@color/colorYellow"
                         android:gravity="center"
                         android:text="MAX"
                         android:textSize="20sp" />
@@ -219,20 +219,20 @@
                         android:layout_height="match_parent"
                         android:layout_margin="1dp"
                         android:layout_weight="1"
-                        android:background="@color/colorWhite"
+                        android:background="@color/colorYellow"
                         android:gravity="center"
                         android:text="BDH"
                         android:textSize="20sp" />
 
                     <TextView
-                        android:id="@+id/ButtonHold"
+                        android:id="@+id/ButtonCapture"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="1dp"
                         android:layout_weight="1"
-                        android:background="@color/colorWhite"
+                        android:background="@color/colorYellow"
                         android:gravity="center"
-                        android:text="DH"
+                        android:text="Cap"
                         android:textSize="20sp" />
 
                 </LinearLayout>

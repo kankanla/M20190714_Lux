@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">M20190714_Lux</string>
+    <string name="nowritePermission">do not have write permission for the file</string>
+    <string name="getwritePermission">can save capture file</string>
 </resources>

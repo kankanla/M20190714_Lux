@@ -1,10 +1,11 @@
 package com.kankanla.e560.m20190714_lux;
 
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.Image;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
@@ -25,14 +26,15 @@ import java.util.List;
 
 public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIGHT_SensorCallBack, TextView.OnClickListener {
     private final String T = "###  Main2Activity";
-    private TextView textView, textViewA, textViewB;
+    private TextView textView, textViewA, textViewB, menuDate;
+    private TextView ButtonA, ButtonB, ButtonMax, ButtonCapture;
+    private TextView iconHDA, iconHDB, menuMax;
     private boolean booleanViewA, booleanViewB, booleanMax;
-    private TextView ButtonA, ButtonB, ButtonMax, ButtonHold, iconHDA, iconHDB, menuMax, menuDate;
-    private LIGHT_Sensor light_sensor;
     private static final int REQUEST_MEDIA_PROJECTION = 1001;
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 2001;
     private MediaProjectionManager mediaProjectionManager;
     private MediaProjection mediaProjection;
+    private LIGHT_Sensor light_sensor;
     private ScreenShot screenShot;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -41,6 +43,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         getSupportActionBar().hide();
+
         light_sensor = new LIGHT_Sensor(this, this);
         light_sensor.registerListener();
     }
@@ -53,31 +56,34 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
 
         textView = findViewById(R.id.text);
         views.add(textView);
-
         textViewA = findViewById(R.id.textA);
         views.add(textViewA);
         textViewB = findViewById(R.id.textB);
         views.add(textViewB);
 
         ButtonA = findViewById(R.id.ButtonA);
-        views.add(ButtonA);
         ButtonA.setOnClickListener(this);
+        views.add(ButtonA);
+
         ButtonB = findViewById(R.id.ButtonB);
-        views.add(ButtonB);
         ButtonB.setOnClickListener(this);
+        views.add(ButtonB);
+
         ButtonMax = findViewById(R.id.ButtonMax);
-        views.add(ButtonMax);
         ButtonMax.setOnClickListener(this);
-        ButtonHold = findViewById(R.id.ButtonHold);
-        views.add(ButtonHold);
-        ButtonHold.setOnClickListener(this);
+        views.add(ButtonMax);
+
+        ButtonCapture = findViewById(R.id.ButtonCapture);
+        ButtonCapture.setOnClickListener(this);
+        views.add(ButtonCapture);
 
         iconHDA = findViewById(R.id.iconHDA);
-        views.add(iconHDA);
         iconHDA.setTextColor(getResources().getColor(R.color.colorGlay2));
+        views.add(iconHDA);
+
         iconHDB = findViewById(R.id.iconHDB);
-        views.add(iconHDB);
         iconHDB.setTextColor(getResources().getColor(R.color.colorGlay2));
+        views.add(iconHDB);
 
         menuDate = findViewById(R.id.menuDate);
         views.add(menuDate);
@@ -129,21 +135,19 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                     menuMax.setTextColor(getResources().getColor(R.color.colorWhite));
                 }
                 break;
-            case R.id.ButtonHold:
-                StorageShow();
-                if (mediaProjectionManager == null) {
-                    ScreenShow();
-                } else {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                screenShot.getScreenshot();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
+            case R.id.ButtonCapture:
+                try {
+                    ButtonCapture.setEnabled(false);
+                    StorageShow();
+                    if (mediaProjectionManager == null) {
+                        ScreenShow();
+                    } else {
+                        screenShot.getScreenshot2();
+                    }
+                } catch (Exception e) {
+
+                } finally {
+                    ButtonCapture.setEnabled(true);
                 }
                 break;
         }
@@ -179,21 +183,43 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         }
     }
 
+    /**
+     * WRITE_EXTERNAL_STORAGE 権限を要求
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case REQUEST_WRITE_EXTERNAL_STORAGE:
-                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "ファイルの書き込み権限がありません", Toast.LENGTH_LONG).show();
-                    return;
-                } else {
-                    Toast.makeText(this, "キャプチャファイルの保存できます", Toast.LENGTH_LONG).show();
+                if (grantResults.length > 0) {
+                    if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                        /**
+                         * ファイルの書き込み権限がありません
+                         */
+                        Toast.makeText(this, getString(R.string.nowritePermission), Toast.LENGTH_LONG).show();
+                        return;
+                    } else {
+                        /*
+                         *キャプチャファイルの保存できます
+                         */
+                        Toast.makeText(this, getString(R.string.getwritePermission), Toast.LENGTH_LONG).show();
+                    }
                 }
                 break;
         }
     }
 
+    /**
+     * 画面キャプチャの権限の取得
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -206,7 +232,18 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                 }
                 if (mediaProjection == null) {
                     mediaProjection = mediaProjectionManager.getMediaProjection(resultCode, data);
-                    screenShot = new ScreenShot(this, mediaProjection);
+                    screenShot = new ScreenShot(this, mediaProjection, new ScreenShot.ScreenCallback() {
+                        @Override
+                        public void work1(boolean bl) {
+                            ButtonCapture.setEnabled(bl);
+                            ButtonCapture.setTextColor(Color.BLUE);
+                        }
+
+                        @Override
+                        public void work2(Image image) {
+
+                        }
+                    });
                     screenShot.get();
                 }
                 break;
@@ -247,6 +284,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
     public void SensorVal(float val, String time) {
 
     }
+
 
     private void help() {
 //        https://www.fonts4free.net/nouveau-ibm-font.html
