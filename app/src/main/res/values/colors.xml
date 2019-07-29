@@ -5,9 +5,10 @@
     <color name="colorAccent">#D81B60</color>
     <color name="colorGlay">#949092</color>
     <color name="colorGlay2">#412E41</color>
+    <color name="colorGlay3">#000000</color>
     <color name="colorRED">#41020E</color>
     <color name="colorRED2">#41020E</color>
     <color name="colorWhite">#DFD9DC</color>
-    <color name="colorYellow">#BB9D07</color>
+    <color name="colorYellow">#916105</color>
 
 </resources>

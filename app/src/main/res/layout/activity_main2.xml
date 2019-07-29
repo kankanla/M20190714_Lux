@@ -77,6 +77,10 @@
                     android:gravity="center"
                     android:lines="1"
                     android:padding="50dp"
+                    android:shadowColor="@color/colorGlay3"
+                    android:shadowDx="6"
+                    android:shadowDy="6"
+                    android:shadowRadius="6"
                     android:text="40000"
                     android:textColor="@color/colorWhite"
                     android:textSize="90sp" />
@@ -130,6 +134,10 @@
                         android:gravity="center"
                         android:lines="1"
                         android:padding="6dp"
+                        android:shadowColor="@color/colorGlay3"
+                        android:shadowDx="6"
+                        android:shadowDy="6"
+                        android:shadowRadius="6"
                         android:text="textA"
                         android:textColor="@color/colorWhite"
                         android:textSize="50dp" />
@@ -166,6 +174,10 @@
                         android:gravity="center"
                         android:lines="1"
                         android:padding="5dp"
+                        android:shadowColor="@color/colorGlay3"
+                        android:shadowDx="6"
+                        android:shadowDy="6"
+                        android:shadowRadius="6"
                         android:text="textB"
                         android:textColor="@color/colorWhite"
                         android:textSize="50dp" />
