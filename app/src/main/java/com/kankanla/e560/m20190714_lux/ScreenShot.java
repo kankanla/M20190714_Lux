@@ -30,15 +30,15 @@ public class ScreenShot extends Main2Activity {
     private MediaProjection mediaProjection;
     private ImageReader imageReader;
     private DisplayMetrics dm;
-    private ScreenCallback screenCallback;
+    private ScreenCallback callback;
     private Handler handler;
     private HandlerThread handlerThread;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public ScreenShot(Context context, MediaProjection mediaProjection, ScreenCallback screenCallback) {
+    public ScreenShot(Context context, MediaProjection mediaProjection, ScreenCallback callback) {
         this.context = context;
         this.mediaProjection = mediaProjection;
-        this.screenCallback = screenCallback;
+        this.callback = callback;
         WorkThread();
     }
 
@@ -55,6 +55,7 @@ public class ScreenShot extends Main2Activity {
             @Override
             public boolean handleMessage(Message msg) {
                 getScreenshot2();
+                Log.i(T,Thread.currentThread().getName() + " handlerThread hhh");
                 return false;
             }
         });
@@ -69,17 +70,18 @@ public class ScreenShot extends Main2Activity {
         dm = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(dm);
         imageReader = ImageReader.newInstance(dm.widthPixels, dm.heightPixels, PixelFormat.RGBA_8888, 2);
+        VirtualDisplay virtualDisplay =
+                mediaProjection.createVirtualDisplay("name", dm.widthPixels, dm.heightPixels, dm.densityDpi,
+                        DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, imageReader.getSurface(), null, null);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void getScreenshot2() {
         // ImageReaderから画面を取り出す
+        callback.work1();
         Log.d("debug", "getScreenshot");
         Log.d(T, Thread.currentThread().getName() + "    hhh");
-
-        VirtualDisplay virtualDisplay = mediaProjection.createVirtualDisplay("name", dm.widthPixels, dm.heightPixels, dm.densityDpi,
-                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, imageReader.getSurface(), null, null);
-
+        Log.i(T, imageReader.getHeight() + "   jjjj   " + imageReader.getWidth());
         Image image = imageReader.acquireLatestImage();
         Image.Plane[] planes = image.getPlanes();
         ByteBuffer buffer = planes[0].getBuffer();
@@ -106,15 +108,19 @@ public class ScreenShot extends Main2Activity {
             fileOutputStream.write(bytes.toByteArray());
             fileOutputStream.flush();
             fileOutputStream.close();
+            Thread.sleep(500);
         } catch (IOException e) {
             e.printStackTrace();
-            screenCallback.work1(true);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            callback.work2();
         }
     }
 
     interface ScreenCallback {
-        void work1(boolean bl);
+        void work1();
 
-        void work2(Image image);
+        void work2();
     }
 }
