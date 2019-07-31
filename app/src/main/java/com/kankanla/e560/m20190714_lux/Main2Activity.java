@@ -3,9 +3,7 @@ package com.kankanla.e560.m20190714_lux;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.media.Image;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
@@ -17,6 +15,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -137,38 +136,32 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                 break;
             case R.id.ButtonCapture:
                 try {
-                    ButtonCapture.setEnabled(false);
-                    StorageShow();
+                    storageCheckPermission();
                     if (mediaProjectionManager == null) {
                         ScreenShow();
                     } else {
-                        screenShot.getScreenshot2();
+                        screenShot.getScreenshot();
                     }
                 } catch (Exception e) {
 
-                } finally {
-                    ButtonCapture.setEnabled(true);
                 }
                 break;
         }
     }
 
-    private void StorageShow() {
+    /**
+     * intent.setData(Uri.parse("package:com.kankanla.e560.m20190714_lux"));
+     */
+    private void storageCheckPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
-                Intent intent = new Intent();
-                intent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
-//                intent.setData(Uri.parse("package:com.kankanla.e560.m20190714_lux"));
-                intent.setData(Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, 99);
-                Toast.makeText(this, "ファイルの保存権限を与えてください", Toast.LENGTH_LONG).show();
+
             }
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
-            //            //2019-07-28 02:23:45.512 1424-7165/? I/ActivityManager: START u0 {act=android.settings.APPLICATION_DETAILS_SETTINGS dat=package:com.kankanla.e560.m20190714_lux flg=0x10008000 cmp=com.android.settings/.applications.InstalledAppDetails bnds=[326,1545][986,1713]} from uid 10021
-            //            //intent.setData(Uri.parse("package:" + packageName));
+            //ActivityManager: START u0 {act=android.settings.APPLICATION_DETAILS_SETTINGS dat=package:com.kankanla.e560.m20190714_lux flg=0x10008000 cmp=com.android.settings/.applications.InstalledAppDetails bnds=[326,1545][986,1713]} from uid 10021
+            //intent.setData(Uri.parse("package:" + packageName));
         } else {
             // Permission has already been granted
 //            screenShot.getScreenshot();
@@ -195,17 +188,17 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case REQUEST_WRITE_EXTERNAL_STORAGE:
+                Log.i(T, "onRequestPermissionsResult +++ REQUEST_WRITE_EXTERNAL_STORAGE");
                 if (grantResults.length > 0) {
                     if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                        /**
-                         * ファイルの書き込み権限がありません
-                         */
-                        Toast.makeText(this, getString(R.string.nowritePermission), Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent();
+                        intent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+                        intent.setData(Uri.parse("package:" + getPackageName()));
+                        startActivityForResult(intent, REQUEST_WRITE_EXTERNAL_STORAGE);
+                        Toast.makeText(this, "ファイルの保存権限を与えてください", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.nowritePermission), Toast.LENGTH_SHORT).show();
                         return;
                     } else {
-                        /*
-                         *キャプチャファイルの保存できます
-                         */
                         Toast.makeText(this, getString(R.string.getwritePermission), Toast.LENGTH_LONG).show();
                     }
                 }
@@ -234,18 +227,22 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                     mediaProjection = mediaProjectionManager.getMediaProjection(resultCode, data);
                     screenShot = new ScreenShot(this, mediaProjection, new ScreenShot.ScreenCallback() {
                         @Override
-                        public void work1(boolean bl) {
-                            ButtonCapture.setEnabled(bl);
-                            ButtonCapture.setTextColor(Color.BLUE);
+                        public void work1() {
+                            ButtonCapture.setBackgroundColor(getResources().getColor(R.color.colorGlay));
+                            Log.i(T, "colorGlay");
                         }
 
                         @Override
-                        public void work2(Image image) {
-
+                        public void work2() {
+                            ButtonCapture.setBackgroundColor(getResources().getColor(R.color.colorYellow));
+                            Log.i(T, "colorYellow");
                         }
                     });
                     screenShot.get();
                 }
+                break;
+            case REQUEST_WRITE_EXTERNAL_STORAGE:
+                Log.i(T, "onActivityResult +++ REQUEST_WRITE_EXTERNAL_STORAGE");
                 break;
         }
     }

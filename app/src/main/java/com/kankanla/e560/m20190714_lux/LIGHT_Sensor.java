@@ -10,8 +10,6 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-
-
 import java.text.SimpleDateFormat;
 
 public class LIGHT_Sensor implements SensorEventListener {
@@ -72,8 +70,4 @@ public class LIGHT_Sensor implements SensorEventListener {
 
         void SensorVal(float val, String time);
     }
-
-
-
-
 }
