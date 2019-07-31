@@ -55,7 +55,7 @@ public class ScreenShot extends Main2Activity {
             @Override
             public boolean handleMessage(Message msg) {
                 getScreenshot2();
-                Log.i(T,Thread.currentThread().getName() + " handlerThread hhh");
+                Log.i(T, Thread.currentThread().getName() + " handlerThread hhh");
                 return false;
             }
         });
@@ -102,7 +102,7 @@ public class ScreenShot extends Main2Activity {
         if (!path.isDirectory()) {
             path.mkdir();
         }
-        File file = new File(path, l + "lux.jpg");
+        File file = new File(path, "IMG_" + l + ".jpg");
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             fileOutputStream.write(bytes.toByteArray());
