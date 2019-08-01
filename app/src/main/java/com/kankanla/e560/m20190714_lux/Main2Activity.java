@@ -1,6 +1,8 @@
 package com.kankanla.e560.m20190714_lux;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
@@ -36,7 +38,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
     private LIGHT_Sensor light_sensor;
     private ScreenShot screenShot;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,11 +170,12 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void ScreenShow() {
-        mediaProjectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
-        if (mediaProjectionManager != null) {
-            startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mediaProjectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+            if (mediaProjectionManager != null) {
+                startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
+            }
         }
     }
 
@@ -213,7 +216,8 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
      * @param resultCode
      * @param data
      */
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
