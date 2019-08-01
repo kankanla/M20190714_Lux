@@ -108,7 +108,7 @@ public class ScreenShot extends Main2Activity {
             fileOutputStream.write(bytes.toByteArray());
             fileOutputStream.flush();
             fileOutputStream.close();
-            Thread.sleep(500);
+            Thread.sleep(100);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
