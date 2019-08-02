@@ -243,6 +243,8 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                         }
                     });
                     screenShot.get();
+
+                    //ssssssssssss
                 }
                 break;
             case REQUEST_WRITE_EXTERNAL_STORAGE:
