@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorGlay"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -215,7 +216,12 @@
                         android:layout_weight="1"
                         android:background="@color/colorYellow"
                         android:gravity="center"
+                        android:shadowColor="@color/colorGlay3"
+                        android:shadowDx="3"
+                        android:shadowDy="3"
+                        android:shadowRadius="3"
                         android:text="ADH"
+                        android:textColor="@color/colorWhite"
                         android:textSize="20sp" />
 
                     <TextView
@@ -226,7 +232,12 @@
                         android:layout_weight="1"
                         android:background="@color/colorYellow"
                         android:gravity="center"
+                        android:shadowColor="@color/colorGlay3"
+                        android:shadowDx="3"
+                        android:shadowDy="3"
+                        android:shadowRadius="3"
                         android:text="MAX"
+                        android:textColor="@color/colorWhite"
                         android:textSize="20sp" />
 
                 </LinearLayout>
@@ -244,7 +255,12 @@
                         android:layout_weight="1"
                         android:background="@color/colorYellow"
                         android:gravity="center"
+                        android:shadowColor="@color/colorGlay3"
+                        android:shadowDx="3"
+                        android:shadowDy="3"
+                        android:shadowRadius="3"
                         android:text="BDH"
+                        android:textColor="@color/colorWhite"
                         android:textSize="20sp" />
 
                     <TextView
@@ -255,7 +271,12 @@
                         android:layout_weight="1"
                         android:background="@color/colorYellow"
                         android:gravity="center"
-                        android:text="Cap"
+                        android:shadowColor="@color/colorGlay3"
+                        android:shadowDx="3"
+                        android:shadowDy="3"
+                        android:shadowRadius="3"
+                        android:text="CAP"
+                        android:textColor="@color/colorAccent"
                         android:textSize="20sp" />
 
                 </LinearLayout>

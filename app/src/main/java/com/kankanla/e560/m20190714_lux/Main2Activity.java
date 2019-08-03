@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
     private TextView textView, textViewA, textViewB, menuDate;
     private TextView ButtonA, ButtonB, ButtonMax, ButtonCapture;
     private TextView iconHDA, iconHDB, menuMax;
-    private boolean booleanViewA, booleanViewB, booleanMax;
+    private boolean booleanViewA, booleanViewB, booleanMax, booleanCAP;
     private static final int REQUEST_MEDIA_PROJECTION = 1001;
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 2001;
     private MediaProjectionManager mediaProjectionManager;
@@ -92,6 +93,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         booleanViewA = true;
         booleanViewB = true;
         booleanMax = false;
+        booleanCAP = false;
 
         for (TextView v : views) {
             v.setTypeface(Typeface.createFromAsset(getAssets(), "Nouveau_IBM.ttf"));
@@ -109,39 +111,47 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                 if (booleanViewA) {
                     booleanViewA = false;
                     iconHDA.setTextColor(getResources().getColor(R.color.colorWhite));
+                    ButtonA.setTextColor(getResources().getColor(R.color.colorRED));
                 } else {
                     booleanViewA = true;
                     iconHDA.setTextColor(getResources().getColor(R.color.colorRED));
+                    ButtonA.setTextColor(getResources().getColor(R.color.colorWhite));
                 }
                 break;
             case R.id.ButtonB:
                 if (booleanViewB) {
                     booleanViewB = false;
                     iconHDB.setTextColor(getResources().getColor(R.color.colorWhite));
+                    ButtonB.setTextColor(getResources().getColor(R.color.colorRED));
                 } else {
                     booleanViewB = true;
                     iconHDB.setTextColor(getResources().getColor(R.color.colorRED));
+                    ButtonB.setTextColor(getResources().getColor(R.color.colorWhite));
                 }
                 break;
             case R.id.ButtonMax:
                 if (booleanMax) {
                     booleanMax = false;
                     menuMax.setTextColor(getResources().getColor(R.color.colorGlay2));
+                    ButtonMax.setTextColor(getResources().getColor(R.color.colorWhite));
                 } else {
                     booleanMax = true;
                     menuMax.setTextColor(getResources().getColor(R.color.colorWhite));
+                    ButtonMax.setTextColor(getResources().getColor(R.color.colorGlay2));
                 }
                 break;
             case R.id.ButtonCapture:
-                try {
-                    storageCheckPermission();
-                    if (mediaProjectionManager == null) {
-                        ScreenShow();
-                    } else {
-                        screenShot.getScreenshot();
-                    }
-                } catch (Exception e) {
+                if (!booleanCAP) {
+                    try {
+                        storageCheckPermission();
+                        if (mediaProjectionManager == null) {
+                            ScreenShow();
+                        } else {
+                            screenShot.getScreenshot();
+                        }
+                    } catch (Exception e) {
 
+                    }
                 }
                 break;
         }
@@ -231,19 +241,24 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                                 ButtonCapture.post(new Runnable() {
                                     @Override
                                     public void run() {
+                                        booleanCAP = true;
                                         ButtonCapture.setBackgroundColor(getResources().getColor(R.color.colorGlay));
+                                        ButtonCapture.setShadowLayer(0, 0, 0, R.color.colorGlay);
                                         Log.i(T, "colorGlay");
                                     }
                                 });
                             }
 
                             @Override
-                            public void work2() {
+                            public void work2(final File file) {
                                 ButtonCapture.post(new Runnable() {
                                     @Override
                                     public void run() {
+                                        booleanCAP = false;
                                         ButtonCapture.setBackgroundColor(getResources().getColor(R.color.colorYellow));
+                                        ButtonCapture.setShadowLayer(3, 3, 3, R.color.colorGlay3);
                                         Log.i(T, "colorYellow");
+
                                     }
                                 });
                             }

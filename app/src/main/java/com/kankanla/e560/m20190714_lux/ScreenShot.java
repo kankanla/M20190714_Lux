@@ -112,7 +112,7 @@ public class ScreenShot extends Main2Activity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
-                callback.work2();
+                callback.work2(file);
             }
         }
     }
@@ -120,6 +120,6 @@ public class ScreenShot extends Main2Activity {
     interface ScreenCallback {
         void work1();
 
-        void work2();
+        void work2(File file);
     }
 }
