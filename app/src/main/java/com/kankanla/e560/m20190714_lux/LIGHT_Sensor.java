@@ -7,10 +7,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.icu.util.Calendar;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class LIGHT_Sensor implements SensorEventListener {
     private final String T = "###  LIGHT_Sensor";
@@ -49,13 +49,18 @@ public class LIGHT_Sensor implements SensorEventListener {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     @Override
     public void onSensorChanged(SensorEvent event) {
         switch (event.sensor.getType()) {
             case Sensor.TYPE_LIGHT:
-                callBack.SensorVal(event.values[0], String.valueOf(simpleDateFormat.format(Calendar.getInstance().getTime())));
-                callBack.SensorVal((int) event.values[0], String.valueOf(simpleDateFormat.format(Calendar.getInstance().getTime())));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    callBack.SensorVal(event.values[0], String.valueOf(simpleDateFormat.format(Calendar.getInstance().getTime())));
+                    callBack.SensorVal((int) event.values[0], String.valueOf(simpleDateFormat.format(Calendar.getInstance().getTime())));
+                } else {
+                    callBack.SensorVal(event.values[0], String.valueOf(simpleDateFormat.format(new Date().getTime())));
+                    callBack.SensorVal((int) event.values[0], String.valueOf(simpleDateFormat.format(new Date().getTime())));
+                }
                 break;
         }
     }

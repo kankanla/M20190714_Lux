@@ -1,8 +1,6 @@
 package com.kankanla.e560.m20190714_lux;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
@@ -13,12 +11,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +35,6 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
     private MediaProjection mediaProjection;
     private LIGHT_Sensor light_sensor;
     private ScreenShot screenShot;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,11 +76,11 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         views.add(ButtonCapture);
 
         iconHDA = findViewById(R.id.iconHDA);
-        iconHDA.setTextColor(getResources().getColor(R.color.colorGlay2));
+        iconHDA.setTextColor(getResources().getColor(R.color.colorRED));
         views.add(iconHDA);
 
         iconHDB = findViewById(R.id.iconHDB);
-        iconHDB.setTextColor(getResources().getColor(R.color.colorGlay2));
+        iconHDB.setTextColor(getResources().getColor(R.color.colorRED));
         views.add(iconHDB);
 
         menuDate = findViewById(R.id.menuDate);
@@ -105,7 +102,6 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -115,7 +111,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                     iconHDA.setTextColor(getResources().getColor(R.color.colorWhite));
                 } else {
                     booleanViewA = true;
-                    iconHDA.setTextColor(getResources().getColor(R.color.colorGlay2));
+                    iconHDA.setTextColor(getResources().getColor(R.color.colorRED));
                 }
                 break;
             case R.id.ButtonB:
@@ -124,7 +120,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                     iconHDB.setTextColor(getResources().getColor(R.color.colorWhite));
                 } else {
                     booleanViewB = true;
-                    iconHDB.setTextColor(getResources().getColor(R.color.colorGlay2));
+                    iconHDB.setTextColor(getResources().getColor(R.color.colorRED));
                 }
                 break;
             case R.id.ButtonMax:
@@ -217,34 +213,43 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
      * @param data
      */
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_MEDIA_PROJECTION:
-                if (resultCode != RESULT_OK) {
-                    Toast.makeText(this, "User cancelled", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (mediaProjection == null) {
-                    mediaProjection = mediaProjectionManager.getMediaProjection(resultCode, data);
-                    screenShot = new ScreenShot(this, mediaProjection, new ScreenShot.ScreenCallback() {
-                        @Override
-                        public void work1() {
-                            ButtonCapture.setBackgroundColor(getResources().getColor(R.color.colorGlay));
-                            Log.i(T, "colorGlay");
-                        }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if (resultCode != RESULT_OK) {
+                        Toast.makeText(this, "User cancelled", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if (mediaProjection == null) {
+                        mediaProjection = mediaProjectionManager.getMediaProjection(resultCode, data);
+                        screenShot = new ScreenShot(this, mediaProjection, new ScreenShot.ScreenCallback() {
+                            @Override
+                            public void work1() {
+                                ButtonCapture.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ButtonCapture.setBackgroundColor(getResources().getColor(R.color.colorGlay));
+                                        Log.i(T, "colorGlay");
+                                    }
+                                });
+                            }
 
-                        @Override
-                        public void work2() {
-                            ButtonCapture.setBackgroundColor(getResources().getColor(R.color.colorYellow));
-                            Log.i(T, "colorYellow");
-                        }
-                    });
-                    screenShot.get();
-
-                    //ssssssssssss
+                            @Override
+                            public void work2() {
+                                ButtonCapture.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ButtonCapture.setBackgroundColor(getResources().getColor(R.color.colorYellow));
+                                        Log.i(T, "colorYellow");
+                                    }
+                                });
+                            }
+                        });
+                        screenShot.get();
+                    }
                 }
                 break;
             case REQUEST_WRITE_EXTERNAL_STORAGE:
@@ -263,6 +268,8 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
 
     @Override
     public void SensorVal(int val, String time) {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         if (booleanMax) {
             if (val > Max) {
                 Max = val;
@@ -281,13 +288,15 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         if (booleanViewB) {
             textViewB.setText(String.valueOf(val));
         }
+        if (val < 5) {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
     }
 
     @Override
     public void SensorVal(float val, String time) {
 
     }
-
 
     private void help() {
 //        https://www.fonts4free.net/nouveau-ibm-font.html

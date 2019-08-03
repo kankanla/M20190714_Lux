@@ -14,7 +14,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.support.annotation.RequiresApi;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -34,7 +33,6 @@ public class ScreenShot extends Main2Activity {
     private Handler handler;
     private HandlerThread handlerThread;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public ScreenShot(Context context, MediaProjection mediaProjection, ScreenCallback callback) {
         this.context = context;
         this.mediaProjection = mediaProjection;
@@ -51,7 +49,6 @@ public class ScreenShot extends Main2Activity {
         handlerThread = new HandlerThread("WorkThread");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper(), new Handler.Callback() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean handleMessage(Message msg) {
                 getScreenshot2();
@@ -65,56 +62,58 @@ public class ScreenShot extends Main2Activity {
         handler.sendEmptyMessage(22);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void get() {
         dm = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(dm);
-        imageReader = ImageReader.newInstance(dm.widthPixels, dm.heightPixels, PixelFormat.RGBA_8888, 2);
-        VirtualDisplay virtualDisplay =
-                mediaProjection.createVirtualDisplay("name", dm.widthPixels, dm.heightPixels, dm.densityDpi,
-                        DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, imageReader.getSurface(), null, null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            imageReader = ImageReader.newInstance(dm.widthPixels, dm.heightPixels, PixelFormat.RGBA_8888, 2);
+            VirtualDisplay virtualDisplay =
+                    mediaProjection.createVirtualDisplay("name", dm.widthPixels, dm.heightPixels, dm.densityDpi,
+                            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, imageReader.getSurface(), null, null);
+        }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void getScreenshot2() {
         // ImageReaderから画面を取り出す
         callback.work1();
-        Log.d("debug", "getScreenshot");
-        Log.d(T, Thread.currentThread().getName() + "    hhh");
-        Log.i(T, imageReader.getHeight() + "   jjjj   " + imageReader.getWidth());
-        Image image = imageReader.acquireLatestImage();
-        Image.Plane[] planes = image.getPlanes();
-        ByteBuffer buffer = planes[0].getBuffer();
+        Log.d(T, "getScreenshot");
+        Log.d(T, Thread.currentThread().getName());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Log.i(T, imageReader.getHeight() + "   jjjj   " + imageReader.getWidth());
+            Image image = imageReader.acquireLatestImage();
+            Image.Plane[] planes = image.getPlanes();
+            ByteBuffer buffer = planes[0].getBuffer();
+            int pixelStride = planes[0].getPixelStride();
+            int rowStride = planes[0].getRowStride();
+            int rowPadding = rowStride - pixelStride * dm.widthPixels;
+            Bitmap bitmap = Bitmap.createBitmap(dm.widthPixels + rowPadding / pixelStride, dm.heightPixels, Bitmap.Config.ARGB_8888);
 
-        int pixelStride = planes[0].getPixelStride();
-        int rowStride = planes[0].getRowStride();
-        int rowPadding = rowStride - pixelStride * dm.widthPixels;
+            // バッファからBitmapを生成
+            bitmap.copyPixelsFromBuffer(buffer);
+            image.close();
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
-        // バッファからBitmapを生成
-        Bitmap bitmap = Bitmap.createBitmap(dm.widthPixels + rowPadding / pixelStride, dm.heightPixels, Bitmap.Config.ARGB_8888);
-        bitmap.copyPixelsFromBuffer(buffer);
-        image.close();
 
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        long l = System.currentTimeMillis();
-        File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "/LUX/");
-        if (!path.isDirectory()) {
-            path.mkdir();
-        }
-        File file = new File(path, "IMG_" + l + ".jpg");
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            fileOutputStream.write(bytes.toByteArray());
-            fileOutputStream.flush();
-            fileOutputStream.close();
-            Thread.sleep(100);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            callback.work2();
+            long l = System.currentTimeMillis();
+            File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "/LUX/");
+            if (!path.isDirectory()) {
+                path.mkdir();
+            }
+            File file = new File(path, "IMG_" + l + ".jpg");
+            try {
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+                fileOutputStream.write(bytes.toByteArray());
+                fileOutputStream.flush();
+                fileOutputStream.close();
+                Thread.sleep(100);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                callback.work2();
+            }
         }
     }
 
