@@ -10,5 +10,6 @@
     <color name="colorRED2">#41020E</color>
     <color name="colorWhite">#DFD9DC</color>
     <color name="colorYellow">#916105</color>
+    <color name="colorWhiteA">#00DA9DBB</color>
 
 </resources>

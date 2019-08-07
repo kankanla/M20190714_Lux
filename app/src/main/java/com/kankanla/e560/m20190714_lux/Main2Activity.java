@@ -36,6 +36,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
     private MediaProjection mediaProjection;
     private LIGHT_Sensor light_sensor;
     private ScreenShot screenShot;
+    private int GOR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -244,7 +245,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                                         booleanCAP = true;
                                         ButtonCapture.setBackgroundColor(getResources().getColor(R.color.colorGlay));
                                         ButtonCapture.setShadowLayer(0, 0, 0, R.color.colorGlay);
-                                        Log.i(T, "colorGlay");
+                                        Log.i(T, "work1");
                                     }
                                 });
                             }
@@ -257,8 +258,10 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                                         booleanCAP = false;
                                         ButtonCapture.setBackgroundColor(getResources().getColor(R.color.colorYellow));
                                         ButtonCapture.setShadowLayer(3, 3, 3, R.color.colorGlay3);
-                                        Log.i(T, "colorYellow");
-
+                                        DialogFL dialogFL = new DialogFL();
+                                        dialogFL.setFile(file);
+                                        dialogFL.show(getSupportFragmentManager(), "dialog");
+                                        Log.i(T, "work2");
                                     }
                                 });
                             }
