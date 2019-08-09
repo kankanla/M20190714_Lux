@@ -3,8 +3,11 @@ package com.kankanla.e560.m20190714_lux;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.ads.MobileAds;
 
 public class MainActivity extends AppCompatActivity {
     protected final String T = "### MainActivity";
@@ -14,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i(T, "onCreate 1");
         super.onCreate(savedInstanceState);
         /*setContentView(R.layout.activity_main);*/
+        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
         Intent intent = new Intent(this, Main2Activity.class);
         startActivity(intent);
     }

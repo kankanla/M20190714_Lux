@@ -5,12 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -43,7 +40,7 @@ public class Lux_SurfaceView extends SurfaceView implements SurfaceHolder.Callba
         bitmapBK = BitmapFactory.decodeResource(getResources(), R.mipmap.rect8152);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         booleanT = true;
