@@ -1,7 +1,9 @@
 package com.kankanla.e560.m20190714_lux;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.media.projection.MediaProjection;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +23,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,21 +45,44 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
     private MediaProjection mediaProjection;
     private LIGHT_Sensor light_sensor;
     private ScreenShot screenShot;
-    private int GOR;
+    private SharedPreferences sharedPreferences;
+    private RelativeLayout relativeLayout;
+    private AdView adView;
+    private AdRequest.Builder builder;
+    private long showTime = 1000 * 60 * 60;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(T, "onCreate");
+        MobileAds.initialize(this, getString(R.string.initialize));
         setContentView(R.layout.activity_main2);
-        getSupportActionBar().hide();
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        sharedPreferences = getSharedPreferences("atime", Context.MODE_PRIVATE);
+        if (sharedPreferences.getLong("atime", 0) == 0) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putLong("atime", System.currentTimeMillis() + showTime);
+            editor.apply();
+        }
+        setAdmob();
 
         light_sensor = new LIGHT_Sensor(this, this);
         light_sensor.registerListener();
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(T, "onResume");
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
+        Log.i(T, "onStart");
         List<TextView> views = new ArrayList<>();
         List<TextView> views2 = new ArrayList<>();
 
@@ -108,6 +139,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
 
     @Override
     public void onClick(View v) {
+        Log.i(T, "onClick");
         switch (v.getId()) {
             case R.id.ButtonA:
                 if (booleanViewA) {
@@ -152,7 +184,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                             screenShot.getScreenshot();
                         }
                     } catch (Exception e) {
-
+                        e.printStackTrace();
                     }
                 }
                 break;
@@ -163,6 +195,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
      * intent.setData(Uri.parse("package:com.kankanla.e560.m20190714_lux"));
      */
     private void storageCheckPermission() {
+        Log.i(T, "storageCheckPermission");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
@@ -175,10 +208,12 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         } else {
             // Permission has already been granted
 //            screenShot.getScreenshot();
+            Log.i(T, "Permission has already been granted");
         }
     }
 
     private void ScreenShow() {
+        Log.i(T, "ScreenShow");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mediaProjectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
             if (mediaProjectionManager != null) {
@@ -189,24 +224,20 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
 
     /**
      * WRITE_EXTERNAL_STORAGE 権限を要求
-     *
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.i(T, "onRequestPermissionsResult");
         switch (requestCode) {
             case REQUEST_WRITE_EXTERNAL_STORAGE:
-                Log.i(T, "onRequestPermissionsResult +++ REQUEST_WRITE_EXTERNAL_STORAGE");
+                Log.i(T, "onRequestPermissionsResult >>> REQUEST_WRITE_EXTERNAL_STORAGE");
                 if (grantResults.length > 0) {
                     if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                         Intent intent = new Intent();
                         intent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
                         intent.setData(Uri.parse("package:" + getPackageName()));
                         startActivityForResult(intent, REQUEST_WRITE_EXTERNAL_STORAGE);
-                        Toast.makeText(this, "ファイルの保存権限を与えてください", Toast.LENGTH_SHORT).show();
                         Toast.makeText(this, getString(R.string.nowritePermission), Toast.LENGTH_SHORT).show();
                         return;
                     } else {
@@ -214,20 +245,19 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                     }
                 }
                 break;
+            case 999:
+                break;
         }
     }
 
     /**
      * 画面キャプチャの権限の取得
-     *
-     * @param requestCode
-     * @param resultCode
-     * @param data
      */
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.i(T, "onActivityResult");
         switch (requestCode) {
             case REQUEST_MEDIA_PROJECTION:
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -272,7 +302,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
                 }
                 break;
             case REQUEST_WRITE_EXTERNAL_STORAGE:
-                Log.i(T, "onActivityResult +++ REQUEST_WRITE_EXTERNAL_STORAGE");
+                Log.i(T, "onActivityResult >>> REQUEST_WRITE_EXTERNAL_STORAGE");
                 break;
         }
     }
@@ -280,6 +310,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.i(T, "onDestroy");
         light_sensor.unregisterListener();
     }
 
@@ -287,6 +318,7 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
 
     @Override
     public void SensorVal(int val, String time) {
+        Log.i(T, "SensorVal");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         if (booleanMax) {
@@ -310,6 +342,15 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
         if (val < 5) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
+
+        if (adView != null) {
+            if (System.currentTimeMillis() - sharedPreferences.getLong("atime", 0) > showTime) {
+                adView.loadAd(builder.build());
+                adView.bringToFront();
+            } else {
+                relativeLayout.removeView(adView);
+            }
+        }
     }
 
     @Override
@@ -317,10 +358,59 @@ public class Main2Activity extends AppCompatActivity implements LIGHT_Sensor.LIG
 
     }
 
-    private void help() {
-//        https://www.fonts4free.net/nouveau-ibm-font.html
-//        Nouveau_IBM.ttf
-//        https://www.fonts4free.net/secret-code-font.html
-//        SECRCODE.TTF
+    private void setAdmob() {
+        Log.i(T, "setAdmob");
+        relativeLayout = findViewById(R.id.ac2admob);
+        adView = findViewById(R.id.adview);
+        builder = new AdRequest.Builder();
+//        builder.addTestDevice("C9517774AEB25C5D4B40D8175F152E03");
+//        builder.addTestDevice("78957C13BCC9AA1AC5D8462F2DEC083A");
+        adView.loadAd(builder.build());
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                Log.i(T, "onAdClosed");
+            }
+
+            @Override
+            public void onAdFailedToLoad(int i) {
+                super.onAdFailedToLoad(i);
+                Log.i(T, "onAdFailedToLoad");
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                super.onAdLeftApplication();
+                Log.i(T, "onAdLeftApplication");
+            }
+
+            @Override
+            public void onAdOpened() {
+                super.onAdOpened();
+                Log.i(T, "onAdOpened");
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putLong("atime", System.currentTimeMillis());
+                editor.apply();
+            }
+
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                Log.i(T, "onAdLoaded");
+            }
+
+            @Override
+            public void onAdClicked() {
+                super.onAdClicked();
+                Log.i(T, "onAdClicked");
+            }
+
+            @Override
+            public void onAdImpression() {
+                super.onAdImpression();
+                Log.i(T, "onAdImpression");
+            }
+        });
     }
 }

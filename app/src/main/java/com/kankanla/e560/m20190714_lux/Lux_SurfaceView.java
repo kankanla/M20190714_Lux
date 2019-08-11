@@ -118,12 +118,12 @@ public class Lux_SurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     @Override
-    public void SensorVal(int val ,String time) {
+    public void SensorVal(int val, String time) {
         senValI = val;
     }
 
     @Override
-    public void SensorVal(float val ,String time) {
+    public void SensorVal(float val, String time) {
         senValF = val;
     }
 

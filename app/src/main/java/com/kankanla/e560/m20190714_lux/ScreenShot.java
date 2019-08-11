@@ -79,7 +79,7 @@ public class ScreenShot extends Main2Activity {
         Log.d(T, "getScreenshot");
         Log.d(T, Thread.currentThread().getName());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Log.i(T, imageReader.getHeight() + "   jjjj   " + imageReader.getWidth());
+            Log.i(T, imageReader.getHeight() + "   x   " + imageReader.getWidth());
             Image image = imageReader.acquireLatestImage();
             Image.Plane[] planes = image.getPlanes();
             ByteBuffer buffer = planes[0].getBuffer();
@@ -94,12 +94,12 @@ public class ScreenShot extends Main2Activity {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
-
             long l = System.currentTimeMillis();
             File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "/LUX/");
             if (!path.isDirectory()) {
                 path.mkdir();
             }
+
             File file = new File(path, "IMG_" + l + ".jpg");
             try {
                 FileOutputStream fileOutputStream = new FileOutputStream(file);

@@ -52,6 +52,7 @@ public class LIGHT_Sensor implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        Log.i(T, " onSensorChanged");
         switch (event.sensor.getType()) {
             case Sensor.TYPE_LIGHT:
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -61,6 +62,8 @@ public class LIGHT_Sensor implements SensorEventListener {
                     callBack.SensorVal(event.values[0], String.valueOf(simpleDateFormat.format(new Date().getTime())));
                     callBack.SensorVal((int) event.values[0], String.valueOf(simpleDateFormat.format(new Date().getTime())));
                 }
+                break;
+            case 99:
                 break;
         }
     }

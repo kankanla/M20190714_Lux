@@ -1,5 +1,8 @@
 <resources>
-    <string name="app_name">M20190714_Lux</string>
+    <string name="app_name">Light Meter</string>
+    <string name="app_name2">M20190714_Lux</string>
     <string name="nowritePermission">do not have write permission for the file</string>
     <string name="getwritePermission">can save capture file</string>
+    <string name="setAdUnitId" translatable="false">ca-app-pub-0547405774182700/8125989656</string>
+    <string name="initialize" translatable="false">ca-app-pub-0547405774182700~9111945877</string>
 </resources>

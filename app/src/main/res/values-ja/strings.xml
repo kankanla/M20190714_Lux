@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LUXメーター 照度計</string>
+    <string name="app_name2">M20190714_Lux</string>
+    <string name="getwritePermission">キャプチャファイルを保存できます</string>
+    <string name="nowritePermission">ファイルへの書き込み権限がありません</string>
+</resources>

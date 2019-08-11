@@ -4,7 +4,12 @@
     android:id="@+id/MainActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorGlay2"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/rect947" />
 </LinearLayout>
